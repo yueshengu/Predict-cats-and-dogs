@@ -32,7 +32,7 @@ source("./lib/feature.R")
 tm_feature_train <- system.time(dat_train <- feature(img_train_dir, "img_zip_train"))
 tm_feature_test <- system.time(dat_test <- feature(img_test_dir, "img_zip_test"))
 save(dat_train, file="./output/feature_train.RData")
-save(dat_train, file="./output/feature_test.RData")
+save(dat_test, file="./output/feature_test.RData")
 ```
 
 ### Train a classification model with training images
