@@ -1,5 +1,6 @@
 source("http://bioconductor.org/biocLite.R")
 biocLite("EBImage")
+biocLite("SIFT.Hsapiens.dbSNP137")
 
 library(EBImage)
 
@@ -41,3 +42,18 @@ moments3<-moments[moments[,3]<34,]
 sapply(1:nrow(moments3),function(i){
   text((moments3[i,1]),(400-moments3[i,2]),i,cex=1,col='green')
 })
+
+
+library(SIFT.Hsapiens.dbSNP137)
+## metadata
+metadata(SIFT.Hsapiens.dbSNP137)
+## keys are the DBSNPID (NCBI dbSNP ID)
+dbsnp <- keys(SIFT.Hsapiens.dbSNP137)
+head(dbsnp)
+columns(SIFT.Hsapiens.dbSNP137)
+## Return all columns. Note that the key, DBSNPID,
+## is always returned.
+select(SIFT.Hsapiens.dbSNP137, dbsnp[10])
+## subset on keys and cols
+cols <- c("VARIANT", "PROVEANPRED", "SIFTPRED")
+select(SIFT.Hsapiens.dbSNP137, dbsnp[20:23], cols)
