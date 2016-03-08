@@ -16,11 +16,10 @@ test <- function(fit_train, dat_test){
   ### Output: training model specification
   
   ### load libraries
-  library("gbm")
+  library(e1071)
   
-  pred <- predict(fit_train$fit, newdata=dat_test, 
-                  n.trees=fit_train$iter, type="response")
-  
-  return(as.numeric(pred> 0.5))
+  svm_predicted <- predict(fit_train, dat_test)
+  return(svm_predicted)
+
 }
 
