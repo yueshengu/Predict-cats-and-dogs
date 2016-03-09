@@ -5,6 +5,7 @@
 ### Author: Yuting Ma
 ### Project 3
 ### ADS Spring 2016
+## Return two vectors, first is baseline, second is predicted
 
 test <- function(fit_train, dat_test){
   
