@@ -4,6 +4,7 @@ biocLite("SIFT.Hsapiens.dbSNP137")
 
 library(EBImage)
 
+
 img<-readImage("C:/Users/ygu/Desktop/columbia/Abyssinian_1.jpg")
 display(img)
 display(img[,,1])
@@ -43,17 +44,45 @@ sapply(1:nrow(moments3),function(i){
   text((moments3[i,1]),(400-moments3[i,2]),i,cex=1,col='green')
 })
 
+fileNames<-dir('C:/Users/ygu/Desktop/columbia/images')
+trainFileNames<-sample(fileNames,round(length(fileNames)*.7,0))
 
-library(SIFT.Hsapiens.dbSNP137)
-## metadata
-metadata(SIFT.Hsapiens.dbSNP137)
-## keys are the DBSNPID (NCBI dbSNP ID)
-dbsnp <- keys(SIFT.Hsapiens.dbSNP137)
-head(dbsnp)
-columns(SIFT.Hsapiens.dbSNP137)
-## Return all columns. Note that the key, DBSNPID,
-## is always returned.
-select(SIFT.Hsapiens.dbSNP137, dbsnp[10])
-## subset on keys and cols
-cols <- c("VARIANT", "PROVEANPRED", "SIFTPRED")
-select(SIFT.Hsapiens.dbSNP137, dbsnp[20:23], cols)
+im2<-channel(Image.fHigh[,,1],"gray")
+stackObjects(im2,img[,,1])
+display(stackObjects(im2,img[,,1]),all=T)
+cmaskt = closing( gblur(tub, 1) > 0.105, makeBrush(5, shape='disc') )
+
+cmask  = propagate(tub, seeds=nmask, mask=cmaskt, lambda = 0.001)
+
+
+
+x = readImage(system.file('images', 'shapes.png', package='EBImage'))
+x = x[110:512,1:130]
+y = bwlabel(x)
+display(normalize(y), title='Objects')
+z = stackObjects(y, normalize(y))
+display(z, title='Stacked objects')
+
+## load images
+nuc = readImage(system.file('images', 'nuclei.tif', package='EBImage'))
+cel = readImage(system.file('images', 'cells.tif', package='EBImage'))
+img = rgbImage(green=cel, blue=nuc)
+display(img, title='Cells')
+
+## segment nuclei
+nmask = thresh(nuc, 10, 10, 0.05)
+nmask = opening(nmask, makeBrush(5, shape='disc'))
+nmask = fillHull(bwlabel(nmask))
+
+## segment cells, using propagate and nuclei as 'seeds'
+ctmask = opening(cel>0.1, makeBrush(5, shape='disc'))
+cmask = propagate(cel, nmask, ctmask)
+
+## using paintObjects to highlight objects
+res = paintObjects(cmask, img, col='#ff00ff')
+res = paintObjects(nmask, res, col='#ffff00')
+display(res, title='Segmented cells')
+
+## stacked cells
+st = stackObjects(cmask, img)
+display(st, title='Stacked objects')

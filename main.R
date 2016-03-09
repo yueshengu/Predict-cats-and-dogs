@@ -26,6 +26,11 @@ img_test_feature_dir <- "../data/testfeatures/"
 file_names <- dir(img_train_dir)
 test_file_names <- dir(img_test_dir)
 
+
+fileNames<-dir('C:/Users/ygu/Desktop/columbia/images')
+trainFileNames<-sample(fileNames,round(length(fileNames)*.7,0))
+testFileNames<-fileNames[!fileNames%in%trainFileNames]
+
 #               Class Labels
 #############################################
 train_label <- c()
