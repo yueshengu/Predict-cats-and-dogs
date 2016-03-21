@@ -313,13 +313,16 @@ watershed(im,p) %>% plot(main="Watershed transform")
 NewTrain<-cbind(as.numeric(as.character(train_label)),baseline_train_features)
 colnames(NewTrain)<-c('y',paste0('x',1:888))
 OldTrain<-NewTrain[,1:801]
+NewTest<-cbind(as.numeric(as.character(test_label)),baseline_test_features)
+colnames(NewTest)<-c('y',paste0('x',1:888))
+OldTest<-NewTest[,1:801]
 gbmOld<-gbm(y~.,
             distribution = "bernoulli",
             data = data.frame(OldTrain),
-            n.trees = 8000,
-            interaction.depth = 1,
-            n.minobsinnode = 10,
-            shrinkage = 0.001,
+            n.trees = 5000,
+            interaction.depth = 3,
+            n.minobsinnode = 50,
+            shrinkage = 0.01,
             bag.fraction = 1,
             train.fraction = .7,
             cv.folds=0,
@@ -329,10 +332,15 @@ gbmOld<-gbm(y~.,
             n.cores = NULL)
 
 best.iter <- gbm.perf(gbmOld,method="test")
+pred.gbmOld<-predict(gbmOld,data.frame(OldTest),n.trees=best.iter,type='response')
+pred.gbmOldClass<-round(pred.gbmOld,0)
 
+error<-table(pred = pred.gbmOldClass, true = test_label)
+(error[2] + error[3]) / sum(error)
 
-
-
+depth 2,3,4
+nodes 10,50,100
+shrinkage 0.1,0.01,0.001
 
 
 

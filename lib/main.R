@@ -19,7 +19,7 @@ library(stringr)
 img_dir <- 'C:/Users/ygu/Desktop/columbia/images'
 #img_feature_dir <- 'C:/Users/DELL/Documents/R/cycle3cvd-team9/data/feature/'
 file_names <- dir(img_dir)
-set.seed(1)
+set.seed(8)
 train_index <- sample(1:length(file_names), round(length(file_names)*.7, 0))
 
 #               Class Labels
@@ -65,7 +65,7 @@ baseline_predict_timeNew<-system.time(baseline_predictionsNew<-test(baseline_mod
                                                                     baseline_test_features))
 #4sec
 baseline_resultsNew = table(pred = baseline_predictionsNew, true = test_label)
-baseline_error_rateNew = (baseline_resultsNew[2] + baseline_resultsNew[3]) / sum(baseline_resultsNew) #41%
+baseline_error_rateNew = (baseline_resultsNew[2] + baseline_resultsNew[3]) / sum(baseline_resultsNew) #46%
 
 baseline_predict_timeOld<-system.time(baseline_predictionsOld<-test(baseline_modelOld,
                                                                     baseline_test_features[,1:800]))
