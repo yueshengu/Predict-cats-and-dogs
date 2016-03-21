@@ -1,26 +1,6 @@
-######################################################
-### Fit the classification model with testing data ###
-######################################################
-
-### Author: Yuting Ma
-### Project 3
-### ADS Spring 2016
-## Return two vectors, first is baseline, second is predicted
-
 test <- function(fit_train, dat_test){
   
-  ### Fit the classfication model with testing data
-  
-  ### Input: 
-  ###  - the fitted classification model using training data
-  ###  -  processed features from testing images 
-  ### Output: training model specification
-  
-  ### load libraries
-  library(e1071)
-  
-  svm_predicted <- predict(fit_train, dat_test)
+  svm_predicted <- predict(fit_train, dat_test, type = "response", coupler = "minpair")
   return(svm_predicted)
-
+  
 }
-

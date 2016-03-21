@@ -6,7 +6,7 @@ library(EBImage)
 
 
 img<-readImage("C:/Users/ygu/Desktop/columbia/images/Abyssinian_1.jpg")
-display(img)
+display(img,method="raster")
 display(img[,,1])
 display(img[,,2])
 display(img[,,3])
@@ -25,14 +25,15 @@ display(pBlur, method="raster")
 p2 <- thresh(pBlur, 10, 10, 0.01)
 display(p2, method="raster")
 
-x = makeBrush(9, shape="gaussian", sigma=5)
+x = makeBrush(31, shape="gaussian", sigma=40)
 x <- x / sum(x)
-x
 
-y <- filter2(channel(img,'gray'), x)
+y <- filter2(img, x)
 display(y, method="raster")
 
 display(thresh(y, 10, 10, 0.02), method="raster")
+display(channel(thresh(y, 10, 10, 0.02),'gray'), method="raster")
+
 a<-bwlabel(thresh(filter2(channel(img,'gray'), x), 10, 10, 0.01))
 ac<-computeFeatures.shape(a)
 ac<-ac[rev(order(ac[,1])),]
@@ -117,7 +118,8 @@ ac<-ac[rev(order(ac[,1])),]
 a[!a%in%as.numeric(rownames(ac)[1:10])]<-0
 display(a,method='raster')
 
-
+computeFeatures.moment(a)
+computeFeatures.shape(a)
 
 display(img2)
 display(img2[,,1]>otsu(channel(img2,'gray'), levels=4))
@@ -308,9 +310,25 @@ plot(p,main="Priority map")
 watershed(im,p) %>% plot(main="Watershed transform")
 
 
+NewTrain<-cbind(as.numeric(as.character(train_label)),baseline_train_features)
+colnames(NewTrain)<-c('y',paste0('x',1:888))
+OldTrain<-NewTrain[,1:801]
+gbmOld<-gbm(y~.,
+            distribution = "bernoulli",
+            data = data.frame(OldTrain),
+            n.trees = 8000,
+            interaction.depth = 1,
+            n.minobsinnode = 10,
+            shrinkage = 0.001,
+            bag.fraction = 1,
+            train.fraction = .7,
+            cv.folds=0,
+            keep.data = TRUE,
+            verbose =T,
+            class.stratify.cv=NULL,
+            n.cores = NULL)
 
-
-
+best.iter <- gbm.perf(gbmOld,method="test")
 
 
 
