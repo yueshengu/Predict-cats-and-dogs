@@ -35,34 +35,23 @@ feature <- function(img_dir, feature_dir){
                                     factor(findInterval(mat[,,3], bBin), levels=1:nB)))
     rgb_feature <- as.numeric(freq_rgb$Freq)/(ncol(mat)*nrow(mat)) # normalization
     
-    # identify 10 largest objects (in terms of area) and record infos extracted using 
+    # identify 8 largest objects (in terms of area) and record infos extracted using 
     # computeFeatures.shape and computeFeatures.moment
     objects<-bwlabel(thresh(filter2(channel(img,'gray'), x), 10, 10, 0.01))
     objectsInfo<-cbind(computeFeatures.shape(objects),computeFeatures.moment(objects))
-    #browser()
-    # if(nrow(objectsInfo)<10){
-    #   missingRows<-10-nrow(objectsInfo)
-    #   naDataFrame<-data.frame(matrix(rep(NA,missingRows*11),nrow=missingRows))
-    #   colnames(naDataFrame)<-colnames(objectsInfo)
-    #   top10Objects<-rbind(objectsInfo,naDataFrame)
-    # }else{
-      areaObject10<-rev(sort(objectsInfo[,1]))[8]
-      top10Objects<-objectsInfo[objectsInfo[,1]>=areaObject10,]
-    # }
-    # normalize features
+    
+    areaObject10<-rev(sort(objectsInfo[,1]))[8]
+    top10Objects<-objectsInfo[objectsInfo[,1]>=areaObject10,]
+    
     top10Objects[,1]<-top10Objects[,1]/nrow(img)/ncol(img)
     top10Objects[,2:8]<-top10Objects[,2:8]/(nrow(img)+ncol(img))
     
     object_feature<-c(top10Objects)
     
     feature_eval <- rbind(feature_eval, c(rgb_feature,object_feature))
-    # saveRDS(as.numeric(freq_rgb$Freq)/(ncol(mat)*nrow(mat)), 
-    #         file=paste0(feature_dir, str_sub(list.files(img_dir)[i], 1, -5), ".rds"))
+    
   }
-  
-  # for(i in 1:910)
-  #   feature_matrix2[,i]<-as.numeric(feature_matrix[,i])
-  
+
   save(feature_eval,file=paste0(feature_dir,"feature_eval.RData"))
   return(feature_eval)
 }
