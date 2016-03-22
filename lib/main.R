@@ -15,9 +15,8 @@ library(stringr)
 #       Set up variables and files
 #############################################
 
-#setwd("C:/Users/DELL/Documents/R/cycle3cvd-team9/")
 img_dir <- 'C:/Users/ygu/Desktop/columbia/images'
-#img_feature_dir <- 'C:/Users/DELL/Documents/R/cycle3cvd-team9/data/feature/'
+# img_feature_dir <- 'C:/Users/DELL/Documents/R/cycle3cvd-team9/data/feature/'
 file_names <- dir(img_dir)
 set.seed(8)
 train_index <- sample(1:length(file_names), round(length(file_names)*.7, 0))
@@ -43,20 +42,20 @@ test_label <- as.factor(label[-train_index])
 source("lib/feature.R")
 
 
-baseline_feature_time<-system.time(baseline_features<-feature('C:/Users/ygu/Desktop/columbia/images/', 
-                                                              'C:/Users/ygu/Desktop/columbia/'))
+# baseline_feature_time<-system.time(baseline_features<-feature('C:/Users/ygu/Desktop/columbia/images/', 
+#                                                               'C:/Users/ygu/Desktop/columbia/'))
 
-feature_eval<-baseline_features
-save(feature_eval,file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/feature_eval.RData")
+# feature_eval<-baseline_features
+# save(feature_eval,file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/feature_eval.RData")
 
-#816
-#baseline_features <- readRDS('C:/Users/DELL/Documents/R/cycle3cvd-team9/data/features.rds')
+load('C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/feature_eval.RData')
+baseline_features <- feature_eval
 baseline_train_features <- baseline_features[train_index,]
 baseline_test_features <- baseline_features[-train_index,]
 
 #                Train Models
 #############################################
-source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/ksvm/train.R")
+source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/train.R")
 # baseline on new+old features
 train_timeOld<-system.time(modelOld<-train(baseline_train_features[,1:800],train_label)) #17 min
 save(modelOld,file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/modelOld.RData")
@@ -67,7 +66,7 @@ save(modelNew,file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/modelNew.RData
 
 #                Vallidation on train data
 #############################################
-source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/ksvm/test.R")
+source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/test.R")
 
 modelOld$SVM #32%
 
@@ -94,7 +93,7 @@ adv_error_rateNewTrain= (adv_resultsNewTrain[2] + adv_resultsNewTrain[3]) / sum(
 
 #                Vallidation on test data
 #############################################
-source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/ksvm/test.R")
+source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/test.R")
 
 predict_timeOld<-system.time(predictionsOld<-test(modelOld,baseline_test_features[,1:800])) #3sec
 baseline_resultsOld = table(pred = predictionsOld$baseline, true = test_label)
@@ -120,44 +119,6 @@ cat("Time for training the baseline linear svm with color histograms = ", baseli
 cat("Time for making baseline predictions = ", baseline_predict_time[1], "s \n")
 
 
-#   DID NOT USE THE FOLLOWING FOR BASELINE
-#############################################
-
-### Model selection with cross-validation
-# Choosing between different values of interaction depth for GBM
-source("./lib/cross_validation.R")
-depth_values <- seq(3, 11, 2)
-err_cv <- array(dim=c(length(depth_values), 2))
-K <- 5  # number of CV folds
-for(k in 1:length(depth_values)){
-  cat("k=", k, "\n")
-  err_cv[k,] <- cv.function(dat_train, label_train, depth_values[k], K)
-}
-save(err_cv, file="./output/err_cv.RData")
-
-# Visualize CV results
-pdf("./fig/cv_results.pdf", width=7, height=5)
-plot(depth_values, err_cv[,1], xlab="Interaction Depth", ylab="CV Error",
-     main="Cross Validation Error", type="n", ylim=c(0, 0.15))
-points(depth_values, err_cv[,1], col="blue", pch=16)
-lines(depth_values, err_cv[,1], col="blue")
-arrows(depth_values, err_cv[,1]-err_cv[,2],depth_values, err_cv[,1]+err_cv[,2], 
-       length=0.1, angle=90, code=3)
-dev.off()
-
-# Choose the best parameter value
-depth_best <- depth_values[which.min(err_cv[,1])]
-par_best <- list(depth=depth_best)
-
-# train the model with the entire training set
-tm_train <- system.time(fit_train <- train(dat_train, label_train, par_best))
-save(fit_train, file="./output/fit_train.RData")
-
-### Make prediction 
-tm_test <- system.time(pred_test <- test(fit_train, dat_test))
-save(pred_test, file="./output/pred_test.RData")
-
-### Summarize Running Time
 cat("Time for constructing training features=", tm_feature_train[1], "s \n")
 cat("Time for constructing testing features=", tm_feature_test[1], "s \n")
 cat("Time for training model=", tm_train[1], "s \n")
