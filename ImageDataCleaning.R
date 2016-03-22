@@ -319,7 +319,7 @@ OldTest<-NewTest[,1:801]
 gbmOld<-gbm(y~.,
             distribution = "bernoulli",
             data = data.frame(OldTrain),
-            n.trees = 5000,
+            n.trees = 4000,
             interaction.depth = 3,
             n.minobsinnode = 50,
             shrinkage = 0.01,
@@ -332,17 +332,18 @@ gbmOld<-gbm(y~.,
             n.cores = NULL)
 
 best.iter <- gbm.perf(gbmOld,method="test")
+gbmOld$valid.error[best.iter]
 pred.gbmOld<-predict(gbmOld,data.frame(OldTest),n.trees=best.iter,type='response')
 pred.gbmOldClass<-round(pred.gbmOld,0)
 
 error<-table(pred = pred.gbmOldClass, true = test_label)
 (error[2] + error[3]) / sum(error)
 
-depth 2,3,4
-nodes 10,50,100
+depth 1,2,3
+nodes 10,50
 shrinkage 0.1,0.01,0.001
 
-
+data.frame(depth=rep(1:3,each=6),nodes=rep(rep(c(10,50),each=3),3),shrinkage=rep(c(.1,.01,.001),6))
 
 
 
