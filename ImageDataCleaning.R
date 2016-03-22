@@ -316,38 +316,54 @@ OldTrain<-NewTrain[,1:801]
 NewTest<-cbind(as.numeric(as.character(test_label)),baseline_test_features)
 colnames(NewTest)<-c('y',paste0('x',1:888))
 OldTest<-NewTest[,1:801]
-gbmOld<-gbm(y~.,
+system.time(gbmOld<-gbm(y~.,
             distribution = "bernoulli",
             data = data.frame(OldTrain),
-            n.trees = 5000,
+            n.trees = 500,
             interaction.depth = 3,
             n.minobsinnode = 50,
-            shrinkage = 0.01,
+            shrinkage = 0.1,
             bag.fraction = 1,
             train.fraction = .7,
-            cv.folds=0,
+            cv.folds=5,
             keep.data = TRUE,
             verbose =T,
             class.stratify.cv=NULL,
-            n.cores = NULL)
+            n.cores = NULL))
 
-best.iter <- gbm.perf(gbmOld,method="test")
+best.iter <- gbm.perf(gbmOld,method="cv",plot=F)
+best.iter <- gbm.perf(gbmOld,method="test",plot=F)
+gbmOld$valid.error[best.iter]
 pred.gbmOld<-predict(gbmOld,data.frame(OldTest),n.trees=best.iter,type='response')
 pred.gbmOldClass<-round(pred.gbmOld,0)
 
 error<-table(pred = pred.gbmOldClass, true = test_label)
 (error[2] + error[3]) / sum(error)
 
-depth 2,3,4
-nodes 10,50,100
-shrinkage 0.1,0.01,0.001
+depth 1,2,3
+nodes 10,50
+shrinkage 0.1
+
+data.frame(fold=rep(1:5,each=6),depth=rep(rep(1:3,each=2),5),nodes=rep(c(10,50),15),tree=rep(NA,30),
+           validError=rep(NA,30))
+
+system.time(rbSVM<-ksvm(baseline_train_features[,1:800], y = train_label,kernel = "rbfdot"))
+
+y<-1:333
+kfolds<-5
+set.seed(8)
+id<-sample(1:length(y))
+foldStart<-round(0:(kfolds-1)*(length(id)/kfolds)+1,0)
+foldEnd<-round(1:(kfolds)*(length(id)/kfolds),0)
 
 
+baseline_train_featuresOld<-baseline_train_features[,1:800]
 
+baseline_train_featuresOld2<-
+  baseline_train_featuresOld[,apply(baseline_train_featuresOld, 2, var, na.rm=TRUE) != 0]
 
-
-
-
+pca <- prcomp(baseline_train_featuresOld2, retx=TRUE, center=TRUE, scale=TRUE)
+summary(pca)
 
 
 

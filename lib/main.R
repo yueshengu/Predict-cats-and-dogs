@@ -50,28 +50,34 @@ baseline_feature_time<-system.time(baseline_features<-feature('C:/Users/ygu/Desk
 baseline_train_features <- baseline_features[train_index,]
 baseline_test_features <- baseline_features[-train_index,]
 
-#                Train Baseline
+#                Train 
 #############################################
 source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/ksvm/train.R")
-# baseline on new+old features
-baseline_train_timeNew<-system.time(baseline_modelNew<-train(baseline_train_features,train_label)) #10min
-baseline_train_timeOld<-system.time(baseline_modelOld<-train(baseline_train_features[,1:800],train_label)) 
-#19 sec
+
+train_timeOld<-system.time(modelOld<-train(baseline_train_features[,1:800],train_label)) #17min
+
+
+train_timeNew<-system.time(modelNew<-train(baseline_train_features,train_label)) #
+
 
 #                Test Baseline
 #############################################
 source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/ksvm/test.R")
-baseline_predict_timeNew<-system.time(baseline_predictionsNew<-test(baseline_modelNew,
-                                                                    baseline_test_features))
-#4sec
-baseline_resultsNew = table(pred = baseline_predictionsNew, true = test_label)
+
+predict_timeOld<-system.time(predictionsOld<-test(modelOld,baseline_test_features[,1:800])) #3sec
+baseline_resultsOld = table(pred = predictionsOld$baseline, true = test_label)
+baseline_error_rateOld = (baseline_resultsOld[2] + baseline_resultsOld[3]) / sum(baseline_resultsOld) #32%
+
+adv_resultsOld = table(pred = predictionsOld$adv, true = test_label)
+adv_error_rateOld = (adv_resultsOld[2] + adv_resultsOld[3]) / sum(adv_resultsOld) #29%
+
+
+predict_timeNew<-system.time(predictionsNew<-test(modelNew,baseline_test_features)) #4sec
+baseline_resultsNew = table(pred = predict_timeNew$baseline, true = test_label)
 baseline_error_rateNew = (baseline_resultsNew[2] + baseline_resultsNew[3]) / sum(baseline_resultsNew) #46%
 
-baseline_predict_timeOld<-system.time(baseline_predictionsOld<-test(baseline_modelOld,
-                                                                    baseline_test_features[,1:800]))
-#4sec
-baseline_resultsOld = table(pred = baseline_predictionsOld, true = test_label)
-baseline_error_rateOld = (baseline_resultsOld[2] + baseline_resultsOld[3]) / sum(baseline_resultsOld) #32%
+adv_resultsNew = table(pred = predictionsNew$adv, true = test_label)
+adv_error_rateNew = (adv_resultsNew[2] + adv_resultsNew[3]) / sum(adv_resultsNew) #32%
 
 
 #              Summarize Baseline
