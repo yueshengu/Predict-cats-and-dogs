@@ -25,19 +25,19 @@ display(pBlur, method="raster")
 p2 <- thresh(pBlur, 10, 10, 0.01)
 display(p2, method="raster")
 
-x = makeBrush(31, shape="gaussian", sigma=40)
+x = makeBrush(9, shape="gaussian", sigma=5)
 x <- x / sum(x)
 
 y <- filter2(img, x)
 display(y, method="raster")
 
 display(thresh(y, 10, 10, 0.02), method="raster")
-display(channel(thresh(y, 10, 10, 0.02),'gray'), method="raster")
+display(channel(thresh(y, 10, 10, 0.01),'gray'), method="raster")
 
 a<-bwlabel(thresh(filter2(channel(img,'gray'), x), 10, 10, 0.01))
 ac<-computeFeatures.shape(a)
 ac<-ac[rev(order(ac[,1])),]
-a[!a%in%as.numeric(rownames(ac)[1:10])]<-0
+a[!a%in%as.numeric(rownames(ac)[1:8])]<-0
 display(a,method='raster')
 # 
 fHigh <- matrix(1, nc = 3, nr = 3)
@@ -88,11 +88,11 @@ display(thresh(filter2(channel(img2,'gray'), x), 10, 10, 0.04), method="raster")
 a<-bwlabel(thresh(filter2(channel(img2,'gray'), x), 10, 10, 0.01))
 ac<-computeFeatures.shape(a)
 ac<-ac[rev(order(ac[,1])),]
-a[!a%in%as.numeric(rownames(ac)[1:10])]<-0
+a[!a%in%as.numeric(rownames(ac)[1:8])]<-0
 display(a,method='raster')
 
 img3<-readImage("C:/Users/ygu/Desktop/columbia/images/pug_32.jpg")
-display(img3)
+display(img3,method='raster')
 img3.0<-thresh(channel(img3,'gray'),10,10, .05)
 img3.0<-opening(img3.0, makeBrush(5, shape='disc'))
 display(img3.0>otsu(img3.0, levels=4))
@@ -106,7 +106,7 @@ display(a,method='raster')
 
 
 img4<-readImage("C:/Users/ygu/Desktop/columbia/images/sphynx_175.jpg")
-display(img4)
+display(img4,method='raster')
 img4.0<-thresh(channel(img4,'gray'),10,10, .05)
 img4.0<-opening(img4.0, makeBrush(5, shape='disc'))
 display(img4.0>otsu(img4.0, levels=4))
