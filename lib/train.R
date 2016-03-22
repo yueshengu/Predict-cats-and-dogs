@@ -10,20 +10,21 @@ if(!require(gbm)){
 
 train <- function(dat_train, label_train){
   
+  #train baseline model
   svm_model <- ksvm(dat_train, y = label_train,kernel = "vanilladot")
   
-  boostingTuning<-data.frame(depth=rep(1:3,each=2),nodes=rep(c(10,50),3),tree=rep(NA,6),
-                             cvError=rep(NA,6))
+
+  #tune adv model (gbm)
+  boostingTuning<-data.frame(depth=rep(rep(1:3,each=2)),nodes=rep(c(10,50),3),
+                             tree=rep(NA,6),cvError=rep(NA,6))
   gbmTrain<-data.frame(cbind(as.numeric(as.character(label_train)),dat_train))
   colnames(gbmTrain)<-c('y',paste0('x',1:ncol(dat_train)))
   
-  
   for(i in 1:nrow(boostingTuning)){
     cat(i,'of 6\n')
-    
     gbmTmp<-gbm(y~.,
                 distribution = "bernoulli",
-                data = gbmTrain,
+                data=gbmTrain,
                 n.trees = 500,
                 interaction.depth = boostingTuning$depth[i],
                 n.minobsinnode = boostingTuning$nodes[i],
@@ -37,14 +38,15 @@ train <- function(dat_train, label_train){
                 n.cores = NULL)
     boostingTuning$tree[i]<-gbm.perf(gbmTmp,method="cv",plot=F)
     boostingTuning$cvError[i]<-gbmTmp$cv.error[boostingTuning$tree[i]]
-    
   }
   
   boostingTuning<-boostingTuning[order(boostingTuning$cvError),]
   
+  # train gbm using best tuning parameters
+  
   gbm_model<-gbm(y~.,
                  distribution = "bernoulli",
-                 data = gbmTrain,
+                 data=gbmTrain,
                  n.trees = boostingTuning$tree[1],
                  interaction.depth = boostingTuning$depth[1],
                  n.minobsinnode = boostingTuning$nodes[1],

@@ -50,35 +50,63 @@ baseline_feature_time<-system.time(baseline_features<-feature('C:/Users/ygu/Desk
 baseline_train_features <- baseline_features[train_index,]
 baseline_test_features <- baseline_features[-train_index,]
 
-#                Train 
+#                Train Models
 #############################################
 source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/ksvm/train.R")
+# baseline on new+old features
+train_timeOld<-system.time(modelOld<-train(baseline_train_features[,1:800],train_label)) #17 min
+save(modelOld,file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/modelOld.RData")
 
-train_timeOld<-system.time(modelOld<-train(baseline_train_features[,1:800],train_label)) #17min
+train_timeNew<-system.time(modelNew<-train(baseline_train_features,train_label)) #28min
+save(modelNew,file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/modelNew.RData")
 
 
-train_timeNew<-system.time(modelNew<-train(baseline_train_features,train_label)) #
+#                Vallidation on train data
+#############################################
+source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/ksvm/test.R")
+
+modelOld$SVM #32%
+
+trainFeaturesTmp<-data.frame(baseline_train_features)
+colnames(trainFeaturesTmp)<-paste0('x',1:ncol(trainFeaturesTmp))
+adv_resultsOldTrain=
+  table(pred=round(predict(modelOld$GBM,data.frame(trainFeaturesTmp[,1:800]),n.trees=modelOld$GBMTree,
+                           type='response'),0),
+        true = train_label)
+adv_error_rateOldTrain= (adv_resultsOldTrain[2] + adv_resultsOldTrain[3]) / sum(adv_resultsOldTrain) #15%
 
 
-#                Test Baseline
+
+modelNew$SVM #46%
+
+adv_resultsNewTrain=
+  table(pred=round(predict(modelNew$GBM,data.frame(trainFeaturesTmp),n.trees=modelNew$GBMTree,
+                           type='response'),0),
+        true = train_label)
+adv_error_rateNewTrain= (adv_resultsNewTrain[2] + adv_resultsNewTrain[3]) / sum(adv_resultsNewTrain) #16%
+
+
+
+
+#                Vallidation on test data
 #############################################
 source("C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/lib/ksvm/test.R")
 
 predict_timeOld<-system.time(predictionsOld<-test(modelOld,baseline_test_features[,1:800])) #3sec
 baseline_resultsOld = table(pred = predictionsOld$baseline, true = test_label)
-baseline_error_rateOld = (baseline_resultsOld[2] + baseline_resultsOld[3]) / sum(baseline_resultsOld) #32%
+baseline_error_rateOld = (baseline_resultsOld[2] + baseline_resultsOld[3]) / sum(baseline_resultsOld) #33%
 
 adv_resultsOld = table(pred = predictionsOld$adv, true = test_label)
 adv_error_rateOld = (adv_resultsOld[2] + adv_resultsOld[3]) / sum(adv_resultsOld) #29%
 
 
+
 predict_timeNew<-system.time(predictionsNew<-test(modelNew,baseline_test_features)) #4sec
-baseline_resultsNew = table(pred = predict_timeNew$baseline, true = test_label)
+baseline_resultsNew = table(pred = predictionsNew$baseline, true = test_label)
 baseline_error_rateNew = (baseline_resultsNew[2] + baseline_resultsNew[3]) / sum(baseline_resultsNew) #46%
 
 adv_resultsNew = table(pred = predictionsNew$adv, true = test_label)
-adv_error_rateNew = (adv_resultsNew[2] + adv_resultsNew[3]) / sum(adv_resultsNew) #32%
-
+adv_error_rateNew = (adv_resultsNew[2] + adv_resultsNew[3]) / sum(adv_resultsNew) #29%
 
 #              Summarize Baseline
 #############################################

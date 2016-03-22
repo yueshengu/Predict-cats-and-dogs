@@ -331,8 +331,6 @@ system.time(gbmOld<-gbm(y~.,
             class.stratify.cv=NULL,
             n.cores = NULL))
 
-best.iter <- gbm.perf(gbmOld,method="cv",plot=F)
-best.iter <- gbm.perf(gbmOld,method="test",plot=F)
 gbmOld$valid.error[best.iter]
 pred.gbmOld<-predict(gbmOld,data.frame(OldTest),n.trees=best.iter,type='response')
 pred.gbmOldClass<-round(pred.gbmOld,0)
@@ -342,12 +340,9 @@ error<-table(pred = pred.gbmOldClass, true = test_label)
 
 depth 1,2,3
 nodes 10,50
-shrinkage 0.1
+shrinkage 0.1,0.01,0.001
 
-data.frame(fold=rep(1:5,each=6),depth=rep(rep(1:3,each=2),5),nodes=rep(c(10,50),15),tree=rep(NA,30),
-           validError=rep(NA,30))
-
-system.time(rbSVM<-ksvm(baseline_train_features[,1:800], y = train_label,kernel = "rbfdot"))
+data.frame(depth=rep(1:3,each=6),nodes=rep(rep(c(10,50),each=3),3),shrinkage=rep(c(.1,.01,.001),6))
 
 y<-1:333
 kfolds<-5
