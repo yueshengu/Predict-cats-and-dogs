@@ -45,6 +45,10 @@ source("lib/feature.R")
 
 baseline_feature_time<-system.time(baseline_features<-feature('C:/Users/ygu/Desktop/columbia/images/', 
                                                               'C:/Users/ygu/Desktop/columbia/'))
+
+feature_eval<-baseline_features
+save(feature_eval,file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/feature_eval.RData")
+
 #816
 #baseline_features <- readRDS('C:/Users/DELL/Documents/R/cycle3cvd-team9/data/features.rds')
 baseline_train_features <- baseline_features[train_index,]
