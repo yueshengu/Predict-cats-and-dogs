@@ -48,6 +48,12 @@ source("lib/feature.R")
 # feature_eval<-baseline_features
 # save(feature_eval,file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/feature_eval.RData")
 
+eval_feature_time<-system.time(feature_eval<-
+                                 feature('C:/Users/ygu/Desktop/columbia/validate/',
+                                         'C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/'))
+
+
+
 load('C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/feature_eval.RData')
 baseline_features <- feature_eval
 baseline_train_features <- baseline_features[train_index,]
