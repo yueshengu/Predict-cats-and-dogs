@@ -45,18 +45,23 @@ feature <- function(img_dir, feature_dir){
       
       # identify 8 largest objects (in terms of area) and record infos extracted using 
       # computeFeatures.shape and computeFeatures.moment
-      objects<-bwlabel(thresh(filter2(channel(img,'gray'), x), 10, 10, 0.01))
-      objectsInfo<-cbind(computeFeatures.shape(objects),computeFeatures.moment(objects))
+      if(i==403){
+        feature_eval <- rbind(feature_eval, c(rgb_feature,rep(0,88)))
+      }else{
+        objects<-bwlabel(thresh(filter2(channel(img,'gray'), x), 10, 10, 0.01))
+        objectsInfo<-cbind(computeFeatures.shape(objects),computeFeatures.moment(objects))
+        
+        areaObject10<-rev(sort(objectsInfo[,1]))[8]
+        top10Objects<-objectsInfo[objectsInfo[,1]>=areaObject10,]
+        
+        top10Objects[,1]<-top10Objects[,1]/nrow(img)/ncol(img)
+        top10Objects[,2:8]<-top10Objects[,2:8]/(nrow(img)+ncol(img))
+        
+        object_feature<-c(top10Objects)
+        
+        feature_eval <- rbind(feature_eval, c(rgb_feature,object_feature))
+        }
       
-      areaObject10<-rev(sort(objectsInfo[,1]))[8]
-      top10Objects<-objectsInfo[objectsInfo[,1]>=areaObject10,]
-      
-      top10Objects[,1]<-top10Objects[,1]/nrow(img)/ncol(img)
-      top10Objects[,2:8]<-top10Objects[,2:8]/(nrow(img)+ncol(img))
-      
-      object_feature<-c(top10Objects)
-      
-      feature_eval <- rbind(feature_eval, c(rgb_feature,object_feature))
       }
     
   }
