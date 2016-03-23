@@ -1,5 +1,17 @@
 # Project CatsDogs: Predictive analytics-model evaluation and selection
 
+####Project 3
+
+<b>Team members:</b> Ao Liu al3472, Josh Dillon jmd2228, Jingwei Li jl4549, Yue Shen Gu yg2435, Yuan Zhao yz2885
+
+[Summary] In this project, we developed a new method and improved the classification accuracy for images of cats and dogs to 71%
+
+[Contribution Statement] All team members contributed to the GitHub repository and prepared the presentation. All team members approve our work presented in our GitHub repository including this contribution statement.
+
+<br />
+-----------------------------------------------------------------------------------------------------------------------------------------
+<br />
+
 #### - for cats versus dogs image data
 
 Read [full project description](doc/project3_desc.md)
