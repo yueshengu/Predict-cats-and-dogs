@@ -52,7 +52,12 @@ eval_feature_time<-system.time(feature_eval<-
                                  feature('C:/Users/ygu/Desktop/columbia/validate/',
                                          'C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/'))
 
+feature_eval[is.na(feature_eval)]<-0
 
+save(feature_eval,file='C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/feature_eval.RData')
+
+
+a<-list.files('C:/Users/ygu/Desktop/columbia/validate/')
 
 load('C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/output/feature_eval.RData')
 baseline_features <- feature_eval
@@ -116,6 +121,12 @@ baseline_error_rateNew = (baseline_resultsNew[2] + baseline_resultsNew[3]) / sum
 
 adv_resultsNew = table(pred = predictionsNew$adv, true = test_label)
 adv_error_rateNew = (adv_resultsNew[2] + adv_resultsNew[3]) / sum(adv_resultsNew) #29%
+
+
+
+predict_timeEval<-system.time(predictionsEval<-test(modelNew,feature_eval)) #4sec
+write.csv(predictionsEval[[1]],file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/baseline.csv")
+write.csv(predictionsEval[[2]],file="C:/Users/ygu/Desktop/columbia/cycle3cvd-team9/adv.csv")
 
 #              Summarize Baseline
 #############################################
