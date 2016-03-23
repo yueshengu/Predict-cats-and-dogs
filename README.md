@@ -2,7 +2,8 @@
 
 ####Project 3
 
-Team members: Ao Liu al3472, Josh Dillon jmd2228, Jingwei Li jl4549, Yue Shen Gu yg2435, Yuan Zhao yz2885
+#####Team members: 
+Ao Liu al3472, Josh Dillon jmd2228, Jingwei Li jl4549, Yue Shen Gu yg2435, Yuan Zhao yz2885
 
 Summary: In this project, we developed a new method and improved the classification accuracy for images of cats and dogs to 71%
 
